@@ -1,8 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SphereController : MonoBehaviour {
+	public int time1;
+	public int time2;
+	public int time3;
+	public int time4;
+	public int time5;
+	public TextMesh finalLevel1;
+	public TextMesh timeLevel1;
+	public TextMesh finalLevel2;
+	public TextMesh timeLevel2;
+	public TextMesh finalLevel3;
+	public TextMesh timeLevel3;
+	public TextMesh finalLevel4;
+	public TextMesh timeLevel4;
+	public TextMesh finalLevel5;
+	public TextMesh timeLevel5;
+	public TextMesh finalTotal;
+	public TextMesh finalRating;
+	public TextMesh timeTotal;
+	public TextMesh progressLevel1;
+	public TextMesh progressLevel2;
+	public TextMesh progressLevel3;
+	public TextMesh progressLevel4;
+	public TextMesh progressLevel5;
 	public GameObject level5Collectible1;
 	public GameObject level5Collectible2;
 	public int level5CollectibleProgress;
@@ -10,6 +34,7 @@ public class SphereController : MonoBehaviour {
 	public GameObject level4Collectible2;
 	public GameObject level4Collectible3;
 	public bool onIce = false;
+	public bool onLadder = false;
 	public GameObject IceSphere;
 	public GameObject IceSphere2;
 	public int level3CollectibleProgress;
@@ -18,13 +43,14 @@ public class SphereController : MonoBehaviour {
 	public GameObject level3Collectible3;
 	public GameObject level3Collectible4;
 	public static int currentLevel;
+	public bool canDash = true;
 	public bool canMove = true;
 	public GameObject GoalPad1;
 	public GameObject GoalPad2;
 	public GameObject GoalPad3;
 	public GameObject GoalPad4;
 	public GameObject GoalPad5;
-	public static int amountCollectedTotal;
+	public static float amountCollectedTotal;
 	public static int[] amountCollected = new int[5]{0,0,0,0,0};
 	public float accelerationRate = 0.6f;
 	public float decelerationRate = 0.04f;
@@ -32,11 +58,58 @@ public class SphereController : MonoBehaviour {
 	public bool canJump = true;
 	public Rigidbody rb;
 	// Use this for initialization
+
+	public IEnumerator Timer(){
+		while (!(currentLevel == 6)) {
+			yield return new WaitForSecondsRealtime (1f);
+			switch (currentLevel) {
+			case 1:
+				time1++;
+				break;
+			case 2:
+				time2++;
+				break;
+			case 3:
+				time3++;
+				break;
+			case 4:
+				time4++;
+				break;
+			case 5:
+				time5++;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	public IEnumerator Updater() {
+		timeLevel1.text = "Your time is " + time1.ToString () + ".";
+		timeLevel2.text = "Your time is " + time2.ToString () + ".";
+		timeLevel3.text = "Your time is " + time3.ToString () + ".";
+		timeLevel4.text = "Your time is " + time4.ToString () + ".";
+		timeLevel5.text = "Your time is " + time5.ToString () + ".";
+		timeTotal.text = "Your time is " + (time1 + time2 + time3 + time4 + time5).ToString () + ".";
+		finalLevel1.text = "You got " + amountCollected [0].ToString () + " out of 7 collectibles.";
+		finalLevel2.text = "You got " + amountCollected [1].ToString () + " out of 7 collectibles.";
+		finalLevel3.text = "You got " + amountCollected [2].ToString () + " out of 7 collectibles.";
+		finalLevel4.text = "You got " + amountCollected [3].ToString () + " out of 11 collectibles.";
+		finalLevel5.text = "You got " + amountCollected [4].ToString () + " out of 12 collectibles.";
+		finalTotal.text = "You got " + (amountCollectedTotal).ToString () + "out of 44.";
+		float percentage = amountCollectedTotal / 0.44f;
+		finalRating.text = "You got " + (Mathf.Round(percentage)).ToString () + " percent of completion.";
+		yield return new WaitForFixedUpdate ();
+	}
+
 	void Start () 
 	{
 		transform.position = new Vector3 (0, 6, 0);
+		StartCoroutine (Timer ());
+		currentLevel = 1;
+		amountCollectedTotal = 0;
+		amountCollected = new int[5]{0,0,0,0,0};
 	}
-
+		
 
 	void OnCollisionExit (Collision coll)
 	{
@@ -49,6 +122,8 @@ public class SphereController : MonoBehaviour {
 		}
 		if (coll.gameObject.tag == "IceLadder") {
 			accelerationRate = 0.8f;
+			canDash = true;
+			onLadder = false;
 		}
 			
 	}
@@ -73,17 +148,13 @@ public class SphereController : MonoBehaviour {
 			accelerationRate = 0.2f;
 			onIce = true;
 		}
-		if (coll.gameObject.tag == "IceSlide") {
-			canJump = false;
-			decelerationRate = 0.005f;
-			accelerationRate = 0.08f;
-			onIce = true;
-		}
 		if (coll.gameObject.tag == "IceLadder") {
 			canJump = false;
 			decelerationRate = 0;
 			accelerationRate = 5;
 			onIce = true;
+			canDash = false;
+			onLadder = true;
 		}
 		if (coll.gameObject.tag == "Water") {
 			canJump = true;
@@ -152,6 +223,20 @@ public class SphereController : MonoBehaviour {
 	}
 
 	public void Movement(KeyCode[] keycodes){
+		if (canDash) {
+			if (Input.GetKeyDown (keycodes [0])) {
+				StartCoroutine (Dash (keycodes, 0));
+			}
+			if (Input.GetKeyDown (keycodes [1])) {
+				StartCoroutine (Dash (keycodes, 1));
+			}
+			if (Input.GetKeyDown (keycodes [2])) {
+				StartCoroutine (Dash (keycodes, 2));
+			}
+			if (Input.GetKeyDown (keycodes [3])) {
+				StartCoroutine (Dash (keycodes, 3));
+			}
+		}
 		if (Input.GetKey (keycodes[0])) {
 			rb.velocity = new Vector3 (rb.velocity.x, rb.velocity.y, rb.velocity.z + accelerationRate);
 		}
@@ -166,30 +251,83 @@ public class SphereController : MonoBehaviour {
 		}
 	}
 
-	public IEnumerator Dash(KeyCode Direction){
+	public IEnumerator Dash(KeyCode[] input, int direction){ // It is possible to "Super Dash" (9 times normal speed) but the window is very tight (easier with 2 buttons pressed at the same time).
+		yield return new WaitForEndOfFrame ();
+		canDash = false;
 		var i = 0;
-		while (i < 10) {
-			if (Input.GetKeyDown (Direction)) {
+		while (i < 30) {
+			if (Input.GetKeyDown (input [direction])) {
+				accelerationRate *= 3;
 				break;
 			}
-			if (Input.GetKeyDown (Direction[1])) {
-				break;
-			}
-			if (Input.GetKeyDown (Direction[2])) {
-				break;
-			}
-			if (Input.GetKeyDown (Direction[3])) {
-				break;
-			}
-			yield return new WaitForEndOfFrame ();
+			yield return new WaitForFixedUpdate ();
 			i++;
 		}
+		yield return new WaitForSeconds (0.5f);
+		if (onIce) {
+			if (onLadder) {
+				accelerationRate = 0.08f;
+			} else {
+				accelerationRate = 0.2f;
+			}
+		} else {
+			accelerationRate = 0.8f;
+		}
+		yield return new WaitForSeconds (0.4f);
+		canDash = true;
 	}
 
 	// Update is called once per frame
 	void Update () 
 	{
-		Debug.Log (amountCollected [4]);
+		if (Input.GetKeyDown (KeyCode.Return)) {
+			SceneManager.LoadScene (0);
+		}
+		if (Input.GetKeyDown (KeyCode.Alpha1)) {
+			transform.position = new Vector3 (transform.position.x, 6, transform.position.z);
+		}
+		if (Input.GetKeyDown (KeyCode.Alpha2)) {
+			transform.position = new Vector3 (transform.position.x, 206, transform.position.z);
+		}
+		if (Input.GetKeyDown (KeyCode.Alpha3)) {
+			transform.position = new Vector3 (transform.position.x, 406, transform.position.z);
+		}
+		if (Input.GetKeyDown (KeyCode.Alpha4)) {
+			transform.position = new Vector3 (transform.position.x, 706, transform.position.z);
+		}
+		if (Input.GetKeyDown (KeyCode.Alpha5)) {
+			transform.position = new Vector3 (transform.position.x, 1006, transform.position.z);
+		}
+		if (Input.GetKeyDown (KeyCode.Alpha6)) {
+			transform.position = new Vector3 (transform.position.x, 1506, transform.position.z);
+		}
+
+		StartCoroutine(Updater());
+		if (amountCollected [0] <= 4) {
+			progressLevel1.text ="You have " + (4 - amountCollected [0]).ToString () + " collectibles left.";
+		} else {
+			progressLevel1.text ="You have 0 collectibles left.";
+		}
+		if (amountCollected [1] <= 5) {
+			progressLevel2.text ="You have " + (5 - amountCollected [1]).ToString () + " collectibles left.";
+		} else {
+			progressLevel2.text ="You have 0 collectibles left.";
+		}
+		if (amountCollected [2] <= 5) {
+			progressLevel3.text ="You have " + (5 - amountCollected [2]).ToString () + " collectibles left.";
+		} else {
+			progressLevel3.text ="You have 0 collectibles left.";
+		}
+		if (amountCollected [3] <= 6) {
+			progressLevel4.text ="You have " + (6 - amountCollected [3]).ToString () + " collectibles left.";
+		} else {
+			progressLevel4.text ="You have 0 collectibles left.";
+		}
+		if (amountCollected [4] <= 10) {
+			progressLevel5.text ="You have " + (10 - amountCollected [4]).ToString () + " collectibles left.";
+		} else {
+			progressLevel5.text ="You have 0 collectibles left.";
+		}
 		if ((transform.position.y >= 200 && transform.position.y <= 250) || (transform.position.y >= 1000 && transform.position.y <= 1050 && transform.position.x >= 0 && transform.position.z <= 0)) {
 			decelerationRate = 0.08f;
 			Physics.gravity = new Vector3 (0, -5, 0);
@@ -211,8 +349,11 @@ public class SphereController : MonoBehaviour {
 		if (700 <= transform.position.y && transform.position.y <= 1000){
 			currentLevel = 4;
 		}
-		if (1000 <= transform.position.y && transform.position.y <= 1300){
+		if (1000 <= transform.position.y && transform.position.y <= 1500){
 			currentLevel = 5;
+		}
+		if (1500 <= transform.position.y){
+			currentLevel = 6;
 		}
 		if (amountCollected[0] >= 4) {
 			GoalPad1.SetActive (true);
@@ -286,10 +427,19 @@ public class SphereController : MonoBehaviour {
 		if (transform.position.y > 300) {
 			limit = 60;
 		}
+		if (transform.position.y > 900) {
+			limit = 100;
+		}
 		for (var i = 0; i < limit; i++) {
 			rb.velocity = new Vector3 (0, 0, 0);
 			transform.position = new Vector3 (transform.position.x, transform.position.y + (jump / 300 * 5), transform.position.z);
 			yield return new WaitForEndOfFrame();
+		}
+		if (transform.position.y > 900) {
+			canMove = true;
+			canJump = true;
+			canDash = true;
+			jumpHeight = 20;
 		}
 	}
 }
