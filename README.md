@@ -1,2 +1,2 @@
 # An-Uphill-Battle
-A 3D platformer.
+A Roll the Ball type platformer.
