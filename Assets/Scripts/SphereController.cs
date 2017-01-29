@@ -280,26 +280,35 @@ public class SphereController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if (Input.GetKeyDown (KeyCode.Return)) {
+		if (Input.GetKeyDown (KeyCode.R) && transform.position.y >= 1500) {
+			SceneManager.LoadScene (1);
+		}
+		if (Input.GetKey (KeyCode.Z)) {
+			accelerationRate = 4;
+		}
+		if (Input.GetKeyDown (KeyCode.Q)) {
 			SceneManager.LoadScene (0);
 		}
+		if (Input.GetKeyDown (KeyCode.Return)) {
+			SceneManager.LoadScene (1);
+		}
 		if (Input.GetKeyDown (KeyCode.Alpha1)) {
-			transform.position = new Vector3 (transform.position.x, 6, transform.position.z);
+			transform.position = new Vector3 (0, 6, 0);
 		}
 		if (Input.GetKeyDown (KeyCode.Alpha2)) {
-			transform.position = new Vector3 (transform.position.x, 206, transform.position.z);
+			transform.position = new Vector3 (0, 206, 0);
 		}
 		if (Input.GetKeyDown (KeyCode.Alpha3)) {
-			transform.position = new Vector3 (transform.position.x, 406, transform.position.z);
+			transform.position = new Vector3 (0, 406, 0);
 		}
 		if (Input.GetKeyDown (KeyCode.Alpha4)) {
-			transform.position = new Vector3 (transform.position.x, 706, transform.position.z);
+			transform.position = new Vector3 (0, 706, 0);
 		}
 		if (Input.GetKeyDown (KeyCode.Alpha5)) {
-			transform.position = new Vector3 (transform.position.x, 1006, transform.position.z);
+			transform.position = new Vector3 (0, 1206, 0);
 		}
 		if (Input.GetKeyDown (KeyCode.Alpha6)) {
-			transform.position = new Vector3 (transform.position.x, 1506, transform.position.z);
+			transform.position = new Vector3 (0, 1706, 0);
 		}
 
 		StartCoroutine(Updater());
@@ -346,13 +355,13 @@ public class SphereController : MonoBehaviour {
 		if (400 <= transform.position.y && transform.position.y <= 700){
 			currentLevel = 3;
 		}
-		if (700 <= transform.position.y && transform.position.y <= 1000){
+		if (700 <= transform.position.y && transform.position.y <= 1200){
 			currentLevel = 4;
 		}
-		if (1000 <= transform.position.y && transform.position.y <= 1500){
+		if (1200 <= transform.position.y && transform.position.y <= 1700){
 			currentLevel = 5;
 		}
-		if (1500 <= transform.position.y){
+		if (1700 <= transform.position.y){
 			currentLevel = 6;
 		}
 		if (amountCollected[0] >= 4) {
@@ -427,7 +436,7 @@ public class SphereController : MonoBehaviour {
 		if (transform.position.y > 300) {
 			limit = 60;
 		}
-		if (transform.position.y > 900) {
+		if (transform.position.y > 1100) {
 			limit = 100;
 		}
 		for (var i = 0; i < limit; i++) {
